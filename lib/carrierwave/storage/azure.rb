@@ -1,4 +1,4 @@
-require 'azure'
+require 'azure/storage/blob'
 
 module CarrierWave
   module Storage
@@ -15,10 +15,9 @@ module CarrierWave
 
       def connection
         @connection ||= begin
-          %i(storage_account_name storage_access_key storage_blob_host).each do |key|
-            ::Azure.config.send("#{key}=", uploader.send("azure_#{key}"))
-          end
-          ::Azure::BlobService.new
+          ::Azure::Storage::Blob::BlobService.create(
+            storage_account_name: uploader.azure_storage_account_name,
+            storage_access_key: uploader.azure_storage_access_key)
         end
       end
 
@@ -40,7 +39,7 @@ module CarrierWave
 
         def url(options = {})
           path = ::File.join @uploader.azure_container, @path
-          if @uploader.asset_host
+          if @uploader.asset_host.present?
             "#{@uploader.asset_host}/#{path}"
           else
             @connection.generate_uri(path).to_s
@@ -60,7 +59,7 @@ module CarrierWave
           @content_type = new_content_type
         end
 
-        def exitst?
+        def exists?
           blob.nil?
         end
 
