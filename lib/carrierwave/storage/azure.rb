@@ -17,7 +17,8 @@ module CarrierWave
         @connection ||= begin
           ::Azure::Storage::Blob::BlobService.create(
             storage_account_name: uploader.azure_storage_account_name,
-            storage_access_key: uploader.azure_storage_access_key)
+            storage_access_key: uploader.azure_storage_access_key,
+            storage_blob_host: uploader.azure_storage_blob_host)
         end
       end
 
